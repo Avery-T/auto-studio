@@ -1,5 +1,9 @@
 from tkinter import * 
 import subprocess
+import os 
+import time
+import asyncio 
+
 
 root = Tk()
 root.title('Auto Filmer')
@@ -13,8 +17,10 @@ class Studio:
       myFrame = Frame(master) 
       myFrame.pack() 
 
-      self.flmBtn = Button(master, text="click me",command=self.film) 
-      self.flmBtn.pack(pady=20)
+      self.filmBtn = Button(master, text="Start Filming",command=self.film) 
+      self.filmBtn.pack(pady=5)
+      self.filmLabel = Label(master, text = "Make Sure the Camera switch is switched to the film icon\n Camera will not record if its just ON", font =("Courier"))
+      self.filmLabel.pack() 
 
       self.audioRecBtn = Button(master, text="Start a solo podcast", command=self.recordAudio) 
       self.audioRecBtn.pack(pady=20)
@@ -33,9 +39,18 @@ class Studio:
     def film(self): 
 
       if not self.filmBtnClicked:
-        p = subprocess.Popen('./scripts/record_video.sh', shell=True)
-        self.filmBtnClicked = True
-        self.filmBtn['text'] = 'Click To Stop Filming'
+        process = subprocess.Popen('./scripts/record_video.sh', shell=True)
+        #stdout and stderr are io blocking so this checks if the program is runing blocking io for only 4s not infinitly 
+        time.sleep(4) #wait for the start record_video script to run all the functions
+        checkForRuningProcess = subprocess.Popen('pgrep gphoto2', shell=True, stdout=subprocess.PIPE) 
+        runing = checkForRuningProcess.communicate()[0].decode() 
+
+        if runing:  
+          self.filmBtnClicked = True
+          self.filmBtn['text'] = 'Click To Stop Filming'
+          self.filmLabel['text'] = '' 
+        else:
+          self.filmLabel['text'] = 'Camera Not Detected'  
         
       else:
         subprocess.run('kill $(pgrep gphoto2)', shell=True)
@@ -44,7 +59,7 @@ class Studio:
 
     def recordAudio(self):
       if not self.audioRecBtnClicked:
-        p = subprocess.Popen('./scripts/record_audio.sh', shell=True)
+        process = subprocess.Popen('./scripts/record_audio.sh', shell=True)
         self.audioRecBtnClicked = True
         self.audioRecBtn['text'] = 'Click To Start Podcasting'
     #resets the uploading text on new action
