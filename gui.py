@@ -7,7 +7,7 @@ import asyncio
 
 root = Tk()
 root.title('Auto Filmer')
-root.geometry("400x400") 
+root.geometry("1080x1080") 
 
 
 
@@ -24,21 +24,27 @@ class Studio:
 
       self.audioRecBtn = Button(master, text="Start a solo podcast", command=self.recordAudio) 
       self.audioRecBtn.pack(pady=20)
+      self.audioLabel = Label(master, text = "make sure audio equipment is turned on", font =("Courier"))
+      self.audioLabel.pack()
 
       self.sendFiles = Button(master, text="Send Files To Server", command=self.sendFilesToServer)  
       self.sendFiles.pack(pady=20)
       
-      self.sendFilesLabel = Label(master, text = "", font =("Courier", 20))
+      self.sendFilesLabel = Label(master, text = "Make Sure the Camera is on to download", font =("Courier"))
       self.sendFilesLabel.pack()
        
 
       self.filmBtnClicked = False  
       self.audioRecBtnClicked = False 
       self.sendBtnclicked  = False
-      
+    
+
+    #generalize this funciton 
+
     def film(self): 
 
       if not self.filmBtnClicked:
+
         process = subprocess.Popen('./scripts/record_video.sh', shell=True)
         #stdout and stderr are io blocking so this checks if the program is runing blocking io for only 4s not infinitly 
         time.sleep(4) #wait for the start record_video script to run all the functions
@@ -59,18 +65,32 @@ class Studio:
 
     def recordAudio(self):
       if not self.audioRecBtnClicked:
-        process = subprocess.Popen('./scripts/record_audio.sh', shell=True)
-        self.audioRecBtnClicked = True
-        self.audioRecBtn['text'] = 'Click To Start Podcasting'
-    #resets the uploading text on new action
-      else:
-        subprocess.run('kill $(pgrep parecord)', shell=True)
-        self.audioRecBtnClicked = False
-        self.audioRecBtn['text'] = 'Click To Start Podcasting'
 
-    
+        process = subprocess.Popen('./scripts/record_audio.sh', shell=True)
+        #stdout and stderr are io blocking so this checks if the program is runing blocking io for only 4s not infinitly 
+        time.sleep(4) #wait for the start record_video script to run all the functions
+        checkForRuningProcess = subprocess.Popen('pgrep parecord', shell=True, stdout=subprocess.PIPE)
+        runing = checkForRuningProcess.communicate()[0].decode()
+
+        if runing:
+          self.audioRecBtnClicked = True
+          self.audioRecBtn['text'] = 'Click To Stop Recording Audio '
+          self.audioLabel['text'] = ''
+        else:
+          self.audioLabel['text'] = 'Audio Equipment not Detected'
+
+      else:
+        subprocess.run('killall parecord', shell=True)
+        self.audioRecBtnClicked = False
+        self.audioRecBtn['text'] = 'Click To Start Recording Audio'
+
+    #fix error handeling  
     def sendFilesToServer(self): 
       process = subprocess.run('./scripts/send_recordings_to_server.sh',shell=True,capture_output=True) 
+     
+
+
+
       consoleOutput = process.stderr.decode() # idk its stderr and not sdtout
 
       if (consoleOutput[0:10] == 'do_connect'):
@@ -78,7 +98,7 @@ class Studio:
       else:
         self.sendFilesLabel['text'] = consoleOutput
         #Assuming its done uploading when it cant output stderr 
-        self.sendFilesLabel['text'] = 'Done uploading'
+        #self.sendFilesLabel['text'] = 'Done uploading'
 
 
 
