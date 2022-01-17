@@ -9,9 +9,12 @@ function downloadVideosFromCamera() {
 
 function sendRecordingsToServer()
 {
+  python turn_on_file_server.py 
+  sleep 1m  #it takes time for the server to start
   smbclient \\\\10.0.0.80\\SommersMedia -U='' password=''    
   smbclient //server/share -c 'cd c:/remote/path ; put local-file'
 }
 
 
 downloadVideosFromCamera
+sendRecordingsToServer 
