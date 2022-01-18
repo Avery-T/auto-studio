@@ -2,13 +2,10 @@ from tkinter import *
 import subprocess
 import os 
 import time
-import asyncio 
-
 
 root = Tk()
 root.title('Auto Filmer')
 root.geometry("1080x1080") 
-
 
 
 class Studio:
@@ -30,7 +27,7 @@ class Studio:
       self.sendFiles = Button(master, text="Send Files To Server", command=self.sendFilesToServer)  
       self.sendFiles.pack(pady=20)
       
-      self.sendFilesLabel = Label(master, text = "Make Sure the Camera is on to download", font =("Courier"))
+      self.sendFilesLabel = Label(master, text = "", font =("Courier"))
       self.sendFilesLabel.pack()
        
 
@@ -60,6 +57,9 @@ class Studio:
         
       else:
         subprocess.run('kill $(pgrep gphoto2)', shell=True)
+        
+        #add code to donwload the video 
+
         self.filmBtnClicked = False
         self.filmBtn['text'] = 'Click To Start Filming'
 
@@ -84,24 +84,14 @@ class Studio:
         self.audioRecBtnClicked = False
         self.audioRecBtn['text'] = 'Click To Start Recording Audio'
 
-    #fix error handeling  
+
     def sendFilesToServer(self): 
-      process = subprocess.run('./scripts/send_recordings_to_server.sh',shell=True,capture_output=True) 
-     
+      process = subprocess.run('./scripts/send_recordings_to_server.sh', shell=True, capture_output=True) 
+      consoleOutput = process.stdout.decode() 
+      self.sendFilesLabel['text'] = consoleOutput
+      self.sendFilesLavel['text'] = 'Done uploading' 
 
 
 
-      consoleOutput = process.stderr.decode() # idk its stderr and not sdtout
-
-      if (consoleOutput[0:10] == 'do_connect'):
-        self.sendFilesLabel['text']='Could not connect to server \n Contact Avery Taylor'
-      else:
-        self.sendFilesLabel['text'] = consoleOutput
-        #Assuming its done uploading when it cant output stderr 
-        #self.sendFilesLabel['text'] = 'Done uploading'
-
-
-
-  
 studio = Studio(root) 
 root.mainloop()
