@@ -9,5 +9,6 @@ client=discord.Client()
 async def on_ready():
    channel = client.get_channel(CHANNEL) 
    await channel.send('$Server-On') 
+   exit()
 
 client.run(TOKEN)          
