@@ -57,9 +57,10 @@ class Studio:
         
       else:
         subprocess.run('kill $(pgrep gphoto2)', shell=True)
-        
+        self.filmLabel['text'] = 'Downlaoding video...' 
+        subprocess.run('./scripts/download_video.sh', shell=True) 
         #add code to donwload the video 
-
+        self.filmLavel['text'] = '' 
         self.filmBtnClicked = False
         self.filmBtn['text'] = 'Click To Start Filming'
 
@@ -86,11 +87,12 @@ class Studio:
 
 
     def sendFilesToServer(self): 
+      self.sendFilesLabel['text'] = 'Server is starting...\nplease wait 3 minutes to start file transfer' 
       process = subprocess.run('./scripts/send_recordings_to_server.sh', shell=True, capture_output=True) 
       consoleOutput = process.stdout.decode() 
       self.sendFilesLabel['text'] = consoleOutput
-      self.sendFilesLavel['text'] = 'Done uploading' 
-
+      self.sendFilesLabel['text'] = 'Done uploading' 
+      
 
 
 studio = Studio(root) 

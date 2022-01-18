@@ -1,20 +1,17 @@
+#change pathing in the future 
 
-#saves the files from the camera 
-#the camera doesnt save after its recording because its process gets killed to end reocrding
-
-function downloadVideosFromCamera() {
-  gphoto2 -P --new --filename "./recordings/%f.mp4"
-}
+function connectToVpn() { 
+  sudo wg-quick up peer5 
+} 
 
 
 function sendRecordingsToServer()
 {
-  python turn_on_file_server.py 
-  sleep 1m  #it takes time for the server to start
-  smbclient \\\\10.0.0.80\\SommersMedia -U='' password=''    
-  smbclient //server/share -c 'cd c:/remote/path ; put local-file'
+  python /home/av/Projects/auto-studio/scripts/file_server_ctrl.py on 2> /dev/null #to get rid of stderr
+  sleep 2m  #it takes time for the server to start
+  smbclient \\\\10.0.0.80\\SommersMedia -U='' --password '' -c 'cd Raw\ ; lcd /home/av/Projects/auto-studio/recordings/; prompt; mput *'
+  python /home/av/Projects/auto-studio/scripts/file_server_ctrl.py off 2> /dev/null 
 }
 
 
-downloadVideosFromCamera
 sendRecordingsToServer 
