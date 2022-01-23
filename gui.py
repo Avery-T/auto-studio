@@ -1,4 +1,5 @@
 from tkinter import * 
+from tkinter import messagebox
 import subprocess
 import os 
 import time
@@ -84,9 +85,11 @@ class Studio:
         subprocess.run('killall parecord', shell=True)
         self.audioRecBtnClicked = False
         self.audioRecBtn['text'] = 'Click To Start Recording Audio'
-
+    
 
     def sendFilesToServer(self): 
+    
+      messagebox.askokcancel("send files","Warning Sending files will halt the program until all the files are sent, this could take hours") 
       self.sendFilesLabel['text'] = 'Server is starting...\nplease wait 3 minutes to start file transfer' 
       process = subprocess.run('./scripts/send_recordings_to_server.sh', shell=True, capture_output=True) 
       consoleOutput = process.stdout.decode() 
