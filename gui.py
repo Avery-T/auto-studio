@@ -60,6 +60,7 @@ class Studio:
         
       else:
         subprocess.run('kill $(pgrep gphoto2)', shell=True)
+        time.sleep(5)
         self.filmLabel['text'] = 'Downlaoding video...' 
         subprocess.run('./scripts/download_video.sh', shell=True) 
         #add code to donwload the video 
