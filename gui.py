@@ -63,7 +63,7 @@ class Studio:
         self.filmLabel['text'] = 'Downlaoding video...' 
         subprocess.run('./scripts/download_video.sh', shell=True) 
         #add code to donwload the video 
-        self.filmLavel['text'] = '' 
+        self.filmLabel['text'] = '' 
         self.filmBtnClicked = False
         self.filmBtn['text'] = 'Click To Start Filming'
 
