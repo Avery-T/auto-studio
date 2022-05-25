@@ -32,12 +32,18 @@ class Studio:
       
       self.sendFilesLabel = Label(master, text = "", font =("Courier"))
       self.sendFilesLabel.pack()
-       
+      
+      
+      self.updateBtn = Button(master, text="check for updates",command=self.update ) 
+      self.updateBtn.pack(pady=5)
+      
+      self.filmLabel = Label(master, text = "check for updates", font =("Courier"))
+      self.filmLabel.pack() 
 
       self.filmBtnClicked = False  
       self.audioRecBtnClicked = False 
       self.sendBtnclicked  = False
-    
+      self.updateCheck = False    
 
     #generalize this funciton 
 
@@ -101,7 +107,19 @@ class Studio:
       self.sendFilesLabel['text'] = consoleOutput
       self.sendFilesLabel['text'] = 'Done uploading' 
       
-
+    
+    def update(self): 
+      process = subprocess.Popen('./scripts/checkForUpdate.sh', shell=True, stdout=subprocess.PIPE)
+      #casted to a int because i just want to know if the local repo is zero or more commits behind
+      consoleOutput = int(process.communicate()[0].decode())
+      
+      if(consoleOutput):
+        print('click to restart and update') 
+      
+      else:
+        self.updateBtn['text'] = 'No updates avaliable'
+      
+      return
 
 studio = Studio(root) 
 root.mainloop()
