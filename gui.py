@@ -119,7 +119,7 @@ class Studio:
       #casted to a int because i just want to know if the local repo is zero or more commits behind
       consoleOutput = int(process.communicate()[0].decode())
       
-      if not (consoleOutput):
+      if (consoleOutput):
         self.updatePresent = True
         self.updateBtn['text'] = 'click again to restart the program and update' 
          
