@@ -5,7 +5,7 @@ from tkinter import messagebox
 import subprocess
 import os 
 import time
-
+from time import sleep
 root = Tk()
 root.title('Auto Filmer')
 root.geometry("1080x1080") 
@@ -32,13 +32,19 @@ class Studio:
       
       self.sendFilesLabel = Label(master, text = "", font =("Courier"))
       self.sendFilesLabel.pack()
-       
+      
+      
+      self.updateBtn = Button(master, text="check for updates",command=self.updateCheck) 
+      self.updateBtn.pack(pady=5)
+      
+      self.filmLabel = Label(master, text = "check for updates", font =("Courier"))
+      self.filmLabel.pack() 
 
       self.filmBtnClicked = False  
       self.audioRecBtnClicked = False 
       self.sendBtnclicked  = False
-    
-
+      self.updatePresent = False    
+     
     #generalize this funciton 
 
     def film(self): 
@@ -70,7 +76,6 @@ class Studio:
 
     def recordAudio(self):
       if not self.audioRecBtnClicked:
-
         process = subprocess.Popen('./scripts/record_audio.sh', shell=True)
         #stdout and stderr are io blocking so this checks if the program is runing blocking io for only 4s not infinitly 
         time.sleep(4) #wait for the start record_video script to run all the functions
@@ -101,7 +106,31 @@ class Studio:
       self.sendFilesLabel['text'] = consoleOutput
       self.sendFilesLabel['text'] = 'Done uploading' 
      
+      
+    
+    def updateCheck(self): 
 
+      if self.updatePresent:
+        self.update()
+        return 
 
+      process = subprocess.Popen('./scripts/checkForUpdate.sh', shell=True, stdout=subprocess.PIPE)
+
+      #casted to a int because i just want to know if the local repo is zero or more commits behind
+      consoleOutput = int(process.communicate()[0].decode())
+      
+      if not (consoleOutput):
+        self.updatePresent = True
+        self.updateBtn['text'] = 'click again to restart the program and update' 
+         
+      else:
+        self.updateBtn['text'] = 'No updates avaliable' 
+      return
+    def update(self): 
+     root.destroy()
+     sleep(2)
+     for i in range(4):
+        print('hello world')
+     process = subprocess.Popen('./scripts/checkForUpdate.sh', shell=True) 
 studio = Studio(root) 
 root.mainloop()
