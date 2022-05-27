@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# yet antoher test
+
 from tkinter import * 
 from tkinter import messagebox
 import subprocess
