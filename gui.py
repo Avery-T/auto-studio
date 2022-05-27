@@ -35,9 +35,9 @@ class Studio:
       
       
       self.updateBtn = Button(master, text="check for updates",command=self.updateCheck) 
-      self.updateBtn.pack(pady=5)
+      self.updateBtn.pack(pady=50)
       
-      self.filmLabel = Label(master, text = "check for updates", font =("Courier"))
+      self.filmLabel = Label(master, text = "Updating closes the program. \nIf there is a update open the program after it closes", font =("Courier"))
       self.filmLabel.pack() 
 
       self.filmBtnClicked = False  
@@ -112,6 +112,7 @@ class Studio:
 
       if self.updatePresent:
         self.update()
+       
         return 
 
       process = subprocess.Popen('./scripts/checkForUpdate.sh', shell=True, stdout=subprocess.PIPE)
@@ -126,12 +127,13 @@ class Studio:
       else:
         self.updateBtn['text'] = 'No updates avaliable' 
       return
+  
     def update(self): 
+
      root.destroy()
-     sleep(2)
-     for i in range(4):
-        print('hello world')
      process = subprocess.Popen('./scripts/update.sh', shell=True) 
+
+     quit() 
 
 studio = Studio(root) 
 root.mainloop()
