@@ -131,6 +131,7 @@ class Studio:
      sleep(2)
      for i in range(4):
         print('hello world')
-     process = subprocess.Popen('./scripts/checkForUpdate.sh', shell=True) 
+     process = subprocess.Popen('./scripts/update.sh', shell=True) 
+
 studio = Studio(root) 
 root.mainloop()
