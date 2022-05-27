@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-#testing to see if update button works
+#yet another test
 from tkinter import * 
 from tkinter import messagebox
 import subprocess
