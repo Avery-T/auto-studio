@@ -9,36 +9,45 @@ from time import sleep
 root = Tk()
 root.title('Auto Filmer')
 root.geometry("1080x1080") 
-
+           
+TEXT = [
+          
+         ['start fliming','click to stop fliming', 
+             'camera not detected', 'make sure camera is on and in film mode'],
+         ['start a solo podcast','audio equipment not detected','click to stop recording auido'], 
+         ['send files to server'], 
+         ['check for updates'], 
+         ['Updating closes the program. \nreopen the program after it closes'],  
+         ['not connected to the internet'] 
+       ]
 
 class Studio:
     
-    def __init__(self, master):
+    def __init__(self, master): 
       myFrame = Frame(master) 
       myFrame.pack() 
-
-      self.filmBtn = Button(master, text="Start Filming",command=self.film) 
+      self.filmBtn = Button(master, text=TEXT[0][0],command=self.film) 
       self.filmBtn.pack(pady=5)
-      self.filmLabel = Label(master, text = "Make Sure the Camera switch is switched to the film icon\n Camera will not record if its just ON", font =("Courier"))
+      self.filmLabel = Label(master, text =TEXT[0][3], font =("Courier"))
       self.filmLabel.pack() 
 
-      self.audioRecBtn = Button(master, text="Start a solo podcast", command=self.recordAudio) 
+      self.audioRecBtn = Button(master, text=TEXT[1][0], command=self.recordAudio) 
       self.audioRecBtn.pack(pady=20)
-      self.audioLabel = Label(master, text = "make sure audio equipment is turned on", font =("Courier"))
+      self.audioLabel = Label(master, font =("Courier"))
       self.audioLabel.pack()
 
-      self.sendFiles = Button(master, text="Send Files To Server", command=self.sendFilesToServer)  
+      self.sendFiles = Button(master, text=TEXT[2][0], command=self.sendFilesToServer)  
       self.sendFiles.pack(pady=20)
       
       self.sendFilesLabel = Label(master, text = "", font =("Courier"))
       self.sendFilesLabel.pack()
       
       
-      self.updateBtn = Button(master, text="check for updates",command=self.updateCheck) 
+      self.updateBtn = Button(master, text=TEXT[3][0],command=self.updateCheck) 
       self.updateBtn.pack(pady=50)
       
-      self.filmLabel = Label(master, text = "Updating closes the program. \nIf there is a update open the program after it closes", font =("Courier"))
-      self.filmLabel.pack() 
+      self.filmLabel = Label(master, text =TEXT[4][0], font =("Courier"))
+      self.filmLabel.pack()
 
       self.filmBtnClicked = False  
       self.audioRecBtnClicked = False 
@@ -59,10 +68,10 @@ class Studio:
 
         if runing:  
           self.filmBtnClicked = True
-          self.filmBtn['text'] = 'Click To Stop Filming'
+          self.filmBtn['text'] = TEXT[0][1]
           self.filmLabel['text'] = '' 
         else:
-          self.filmLabel['text'] = 'Camera Not Detected'  
+          self.filmLabel['text'] = TEXT[0][2]   
         
       else:
         subprocess.run('kill $(pgrep gphoto2)', shell=True)
@@ -72,7 +81,7 @@ class Studio:
         #add code to donwload the video 
         self.filmLabel['text'] = '' 
         self.filmBtnClicked = False
-        self.filmBtn['text'] = 'Click To Start Filming'
+        self.filmBtn['text'] = TEXT[0][0]
 
     def recordAudio(self):
       if not self.audioRecBtnClicked:
@@ -84,22 +93,28 @@ class Studio:
 
         if runing:
           self.audioRecBtnClicked = True
-          self.audioRecBtn['text'] = 'Click To Stop Recording Audio '
+          self.audioRecBtn['text'] = TEXT[1][2] 
           self.audioLabel['text'] = ''
         else:
-          self.audioLabel['text'] = 'Audio Equipment not Detected'
+          self.audioLabel['text'] = TEXT[1][1]
 
       else:
         subprocess.run('killall parecord', shell=True)
         self.audioRecBtnClicked = False
-        self.audioRecBtn['text'] = 'Click To Start Recording Audio'
+        self.audioRecBtn['text'] = TEXT[1][0]
     
 
     def sendFilesToServer(self): 
+      
+      if self.internetCheck(): 
+         self.sendFilesLabel['text'] = TEXT[6][0] 
+         return 
     
-      response = messagebox.askokcancel("send files",
-            "Warning Sending files will halt the program until all the files are sent, this could take hours") 
+      response = messagebox.askokcancel(
+      "send files","Warning Sending files will halt the program until all the files are sent, this could take hours") 
+
       if not response: return 
+
       self.sendFilesLabel['text'] = 'Server is starting...\nplease wait 3 minutes to start file transfer' 
       process = subprocess.run('./scripts/send_recordings_to_server.sh', shell=True, capture_output=True) 
       consoleOutput = process.stdout.decode() 
@@ -114,6 +129,12 @@ class Studio:
         self.update()
        
         return 
+      
+
+      if self.internetCheck(): 
+         self.updateBtn['text'] = 'Please Connect to the internet' 
+         return 
+
 
       process = subprocess.Popen('./scripts/checkForUpdate.sh', shell=True, stdout=subprocess.PIPE)
 
@@ -128,6 +149,14 @@ class Studio:
         self.updateBtn['text'] = 'No updates avaliable' 
       return
   
+    def internetCheck(self): 
+     
+       process = subprocess.Popen('./scripts/internet_check.sh', shell=True, stdout=subprocess.PIPE)
+
+      #casted to a int because i just want to know if the local repo is zero or more commits behind
+       return(int(process.communicate()[0].decode()))
+
+       
     def update(self): 
 
      root.destroy()
