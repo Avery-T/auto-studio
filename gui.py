@@ -11,9 +11,9 @@ root.title('Auto Filmer')
 root.geometry("1080x1080") 
            
 TEXT = [
-          
-         ['start fliming','click to stop fliming', 
-             'camera not detected', 'make sure camera is on and in film mode'],
+         ['click to start fliming','click to stop fliming', 
+             'camera not detected', 
+              'downloading video from camera'],
          ['start a solo podcast','audio equipment not detected','click to stop recording auido'], 
          ['send files to server'], 
          ['check for updates'], 
@@ -27,9 +27,7 @@ class Studio:
       myFrame = Frame(master) 
       myFrame.pack() 
       self.filmBtn = Button(master, text=TEXT[0][0],command=self.film) 
-      self.filmBtn.pack(pady=5)
-      self.filmLabel = Label(master, text =TEXT[0][3], font =("Courier"))
-      self.filmLabel.pack() 
+      self.filmBtn.pack(pady=20)
 
       self.audioRecBtn = Button(master, text=TEXT[1][0], command=self.recordAudio) 
       self.audioRecBtn.pack(pady=20)
@@ -61,8 +59,8 @@ class Studio:
       if not self.filmBtnClicked:
 
         process = subprocess.Popen('./scripts/record_video.sh', shell=True)
-        #stdout and stderr are io blocking so this checks if the program is runing blocking io for only 4s not infinitly 
-        time.sleep(4) #wait for the start record_video script to run all the functions
+        #stdout and stderr are io blocking so this checks if the program is runing blocking 
+        sleep(4) #wait for the start record_video script to run all the functions
         checkForRuningProcess = subprocess.Popen('pgrep gphoto2', shell=True, stdout=subprocess.PIPE) 
         runing = checkForRuningProcess.communicate()[0].decode() 
 
@@ -70,18 +68,23 @@ class Studio:
           self.filmBtnClicked = True
           self.filmBtn['text'] = TEXT[0][1]
           self.filmLabel['text'] = '' 
-        else:
-          self.filmLabel['text'] = TEXT[0][2]   
-        
+
+        else: # camera not detected
+          self.filmBtn['text'] = TEXT[0][2]
+          #each change needs a function, using after so you dont need to sleep the program
+          self.filmBtn.after(2000, lambda: self.filmBtn.configure(text=TEXT[0][0]))
+      
       else:
         subprocess.run('kill $(pgrep gphoto2)', shell=True)
-        time.sleep(5)
-        self.filmLabel['text'] = 'Downlaoding video...' 
+        sleep(5)
+        self.filmBtn['text'] = TEXT[0][3]
         subprocess.run('./scripts/download_video.sh', shell=True) 
         #add code to donwload the video 
-        self.filmLabel['text'] = '' 
+         
+        #self.filmLabel['text'] = '' #done  
         self.filmBtnClicked = False
-        self.filmBtn['text'] = TEXT[0][0]
+        self.filmBtn.after(2000, lambda: self.filmBtn.configure(text=TEXT[0][0]))
+        
 
     def recordAudio(self):
       if not self.audioRecBtnClicked:
@@ -96,7 +99,8 @@ class Studio:
           self.audioRecBtn['text'] = TEXT[1][2] 
           self.audioLabel['text'] = ''
         else:
-          self.audioLabel['text'] = TEXT[1][1]
+          self.audioRecBtn.config(text=TEXT[1][1]) 
+          #self.audioRecBtn.config(text= TEXT[1][0])
 
       else:
         subprocess.run('killall parecord', shell=True)
