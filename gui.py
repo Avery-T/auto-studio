@@ -32,8 +32,8 @@ class Studio:
       self.audioRecBtn = Button(master, text=TEXT[1][0], command=self.recordAudio) 
       self.audioRecBtn.pack(pady=20)
 
-      self.sendFiles = Button(master, text=TEXT[2][0], command=self.sendFilesToServer)  
-      self.sendFiles.pack(pady=20)
+      self.sendFilesBtn = Button(master, text=TEXT[2][0], command=self.sendFilesToServer)  
+      self.sendFilesBtn.pack(pady=20)
       
       self.sendFilesLabel = Label(master, text = "", font =("Courier"))
       self.sendFilesLabel.pack()
@@ -107,7 +107,8 @@ class Studio:
     def sendFilesToServer(self): 
       
       if self.internetCheck(): 
-         self.sendFilesLabel['text'] = TEXT[6][0] 
+         self.sendFilesBtn['text'] = TEXT[5][0] 
+         self.sendFilesBtn.after(2000, lambda: self.sendFilesBtn.configure(text=TEXT[2][0]))
          return 
     
       response = messagebox.askokcancel(
