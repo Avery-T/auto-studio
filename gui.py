@@ -31,8 +31,6 @@ class Studio:
 
       self.audioRecBtn = Button(master, text=TEXT[1][0], command=self.recordAudio) 
       self.audioRecBtn.pack(pady=20)
-      self.audioLabel = Label(master, font =("Courier"))
-      self.audioLabel.pack()
 
       self.sendFiles = Button(master, text=TEXT[2][0], command=self.sendFilesToServer)  
       self.sendFiles.pack(pady=20)
@@ -97,10 +95,9 @@ class Studio:
         if runing:
           self.audioRecBtnClicked = True
           self.audioRecBtn['text'] = TEXT[1][2] 
-          self.audioLabel['text'] = ''
         else:
           self.audioRecBtn.config(text=TEXT[1][1]) 
-          #self.audioRecBtn.config(text= TEXT[1][0])
+          self.audioRecBtn.after(2000, lambda: self.audioRecBtn.configure(text=TEXT[0][0]))
 
       else:
         subprocess.run('killall parecord', shell=True)
