@@ -38,7 +38,6 @@ class Studio:
       self.sendFilesLabel = Label(master, text = "", font =("Courier"))
       self.sendFilesLabel.pack()
       
-      
       self.updateBtn = Button(master, text=TEXT[3][0],command=self.updateCheck) 
       self.updateBtn.pack(pady=50)
       
@@ -82,7 +81,7 @@ class Studio:
         #self.filmLabel['text'] = '' #done  
         self.filmBtnClicked = False
         self.filmBtn.after(2000, lambda: self.filmBtn.configure(text=TEXT[0][0]))
-        
+
 
     def recordAudio(self):
       if not self.audioRecBtnClicked:
@@ -103,7 +102,7 @@ class Studio:
         subprocess.run('killall parecord', shell=True)
         self.audioRecBtnClicked = False
         self.audioRecBtn['text'] = TEXT[1][0]
-    
+
 
     def sendFilesToServer(self): 
       
@@ -122,21 +121,17 @@ class Studio:
       self.sendFilesLabel['text'] = consoleOutput
       self.sendFilesLabel['text'] = 'Done uploading' 
      
-      
     
     def updateCheck(self): 
-
-      if self.updatePresent:
-        self.update()
-       
-        return 
       
-
       if self.internetCheck(): 
          self.updateBtn['text'] = 'Please Connect to the internet' 
          return 
 
-
+      if self.updatePresent:
+        self.update()
+        return 
+      
       process = subprocess.Popen('./scripts/checkForUpdate.sh', shell=True, stdout=subprocess.PIPE)
 
       #casted to a int because i just want to know if the local repo is zero or more commits behind
@@ -157,12 +152,10 @@ class Studio:
       #casted to a int because i just want to know if the local repo is zero or more commits behind
        return(int(process.communicate()[0].decode()))
 
-       
     def update(self): 
-
+     
      root.destroy()
      process = subprocess.Popen('./scripts/update.sh', shell=True) 
-
      quit() 
 
 studio = Studio(root) 
