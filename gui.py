@@ -129,9 +129,12 @@ class Studio:
         
         self.sendFilesLabel['text'] = 'Server is starting...\nplease wait 3 minutes to start file transfer' 
         process = subprocess.run('./scripts/send_recordings_to_server.sh', shell=True, capture_output=True) 
-        consoleOutput = process.stdout.decode()
-        #message box does not work proparly 
-        messagebox.showinfo('files being sent',consoleOutput)
+        
+        
+        #TO DO display the uploading videos
+        #consoleOutput = process.stdout.decode()
+        #messagebox.showinfo('files being sent',consoleOutput)
+
         self.sendFilesLabel['text'] = consoleOutput
         self.sendFilesBtn.after(1000, lambda: self.sendFilesBtn.configure(text=TEXT[2][0]))
         self.sendFilesLabel['text'] = 'Done uploading' 
