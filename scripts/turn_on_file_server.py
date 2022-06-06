@@ -3,6 +3,7 @@
 import discord
 import os
 from env import *
+
 client=discord.Client()
 
 @client.event

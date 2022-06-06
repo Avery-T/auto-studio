@@ -84,6 +84,7 @@ class Studio:
 
 
     def recordAudio(self):
+
       if not self.audioRecBtnClicked:
         process = subprocess.Popen('./scripts/record_audio.sh', shell=True)
         #stdout and stderr are io blocking so this checks if the program is runing blocking io for only 4s not infinitly 
@@ -110,19 +111,44 @@ class Studio:
          self.sendFilesBtn['text'] = TEXT[5][0] 
          self.sendFilesBtn.after(2000, lambda: self.sendFilesBtn.configure(text=TEXT[2][0]))
          return 
-    
-      response = messagebox.askokcancel(
-      "send files","Warning Sending files will halt the program until all the files are sent, this could take hours") 
 
-      if not response: return 
+      self.turnFileServerOnAndConnect() 
 
-      self.sendFilesLabel['text'] = 'Server is starting...\nplease wait 3 minutes to start file transfer' 
-      process = subprocess.run('./scripts/send_recordings_to_server.sh', shell=True, capture_output=True) 
-      consoleOutput = process.stdout.decode() 
-      self.sendFilesLabel['text'] = consoleOutput
-      self.sendFilesLabel['text'] = 'Done uploading' 
-     
-    
+      self.sendFilesBtn['text'] = 'checking to see you can connect to server please wait 2 minutes' 
+      sleep(10)
+
+      if self.fileServerIsOn(): 
+        self.sendFilesBtn.after(1000, lambda: self.sendFilesBtn.configure(text='file server is on uploading files now'))
+
+        response = messagebox.askokcancel(
+        "send files","Warning Sending files will halt the program until all the files are sent, this could take hours") 
+        if not response: return 
+        self.sendFilesBtn.after(1000, lambda: self.sendFilesBtn.configure(text='server in on!'))
+
+
+        
+        self.sendFilesLabel['text'] = 'Server is starting...\nplease wait 3 minutes to start file transfer' 
+        process = subprocess.run('./scripts/send_recordings_to_server.sh', shell=True, capture_output=True) 
+        consoleOutput = process.stdout.decode()
+        #message box does not work proparly 
+        messagebox.showinfo('files being sent',consoleOutput)
+        self.sendFilesLabel['text'] = consoleOutput
+        self.sendFilesBtn.after(1000, lambda: self.sendFilesBtn.configure(text=TEXT[2][0]))
+        self.sendFilesLabel['text'] = 'Done uploading' 
+       
+      else: 
+        lambda: self.sendFilesBtn.configure(text='Cannot connect to server right now')
+        self.sendFilesBtn.after(2000, lambda: self.sendFilesBtn.configure(text=TEXT[2][0]))
+
+
+    def turnFileServerOnAndConnect(self): 
+        subprocess.Popen('./scripts/turn_server_on_and_connect.sh', shell=True)
+
+    def fileServerIsOn(self): 
+      process = subprocess.Popen('./scripts/check_if_file_server_is_up.sh', shell=True, stdout=subprocess.PIPE)
+      return process.communicate()[0].decode() 
+
+
     def updateCheck(self): 
       
       if self.internetCheck(): 
@@ -146,6 +172,7 @@ class Studio:
         self.updateBtn['text'] = 'No updates avaliable' 
       return
   
+
     def internetCheck(self): 
      
        process = subprocess.Popen('./scripts/internet_check.sh', shell=True, stdout=subprocess.PIPE)
