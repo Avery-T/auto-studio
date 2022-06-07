@@ -97,7 +97,7 @@ class Studio:
           self.audioRecBtn['text'] = TEXT[1][2] 
         else:
           self.audioRecBtn.config(text=TEXT[1][1]) 
-          self.audioRecBtn.after(2000, lambda: self.audioRecBtn.configure(text=TEXT[0][0]))
+          self.audioRecBtn.after(2000, lambda: self.audioRecBtn.configure(text=TEXT[1][0]))
 
       else:
         subprocess.run('killall parecord', shell=True)
@@ -111,19 +111,21 @@ class Studio:
          self.sendFilesBtn['text'] = TEXT[5][0] 
          self.sendFilesBtn.after(2000, lambda: self.sendFilesBtn.configure(text=TEXT[2][0]))
          return 
+      
+      #rewrite the check, it takes too long to check if it worked 
+      #self.sendFilesBtn['text'] = 'checking to see you can connect to server please wait 3 minutes' 
 
       self.turnFileServerOnAndConnect() 
-
-      self.sendFilesBtn['text'] = 'checking to see you can connect to server please wait 2 minutes' 
-      sleep(10)
+      time.sleep(185)
+      subprocess.run('./scripts/connect_to_vpn.sh', shell=True) 
 
       if self.fileServerIsOn(): 
-        self.sendFilesBtn.after(1000, lambda: self.sendFilesBtn.configure(text='file server is on uploading files now'))
+        #self.sendFilesBtn.after(1000, lambda: self.sendFilesBtn.configure(text='file server is on uploading files now'))
 
-        response = messagebox.askokcancel(
-        "send files","Warning Sending files will halt the program until all the files are sent, this could take hours") 
-        if not response: return 
-        self.sendFilesBtn.after(1000, lambda: self.sendFilesBtn.configure(text='server in on!'))
+       # response = messagebox.askokcancel(
+       # "send files","Warning Sending files will halt the program until all the files are sent, this could take hours") 
+       # if not response: return 
+       # self.sendFilesBtn.after(1000, lambda: self.sendFilesBtn.configure(text='server in on!'))
 
 
         
@@ -135,7 +137,7 @@ class Studio:
         #consoleOutput = process.stdout.decode()
         #messagebox.showinfo('files being sent',consoleOutput)
 
-        self.sendFilesLabel['text'] = consoleOutput
+        #self.sendFilesLabel['text'] = consoleOutput
         self.sendFilesBtn.after(1000, lambda: self.sendFilesBtn.configure(text=TEXT[2][0]))
         self.sendFilesLabel['text'] = 'Done uploading' 
        
