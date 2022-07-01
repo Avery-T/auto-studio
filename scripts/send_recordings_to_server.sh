@@ -8,9 +8,9 @@ function sendRecordingsToServer()
   #moves all the recordings to the archive so the program doesnt resend the same files
 
   mv ~/Projects/auto-studio/recordings/*  ~/Desktop/recordings-archive/
- 
-  #turns file server off
-  #python ~/Projects/auto-studio/scripts/file_server_ctrl.py off 2> /dev/nullmb
+  #turns file server off and disconnects from vpn 
+  echo "password"| sudo -S wg-quick down peer5 
+  python ~/Projects/auto-studio/scripts/file_server_ctrl.py off #2> /dev/nullmb
 }
 
 
