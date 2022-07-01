@@ -108,33 +108,22 @@ class Studio:
     def sendFilesToServer(self): 
       
       if self.internetCheck(): 
-         self.sendFilesBtn['text'] = GUI_TEXT['internet_options'][2] 
+         self.sendFilesBtn['text'] = GUI_TEXT['internet_options'][1] 
          self.sendFilesBtn.after(2000, lambda: self.sendFilesBtn.configure(text=GUI_TEXT['internet_options'][0]))
          return 
-      
-      #rewrite the check, it takes too long to check if it worked 
-      #self.sendFilesBtn['text'] = 'checking to see you can connect to server please wait 3 minutes' 
-      
-     #dont have the oauth key for the bot right now
-     ###self.turnFileServerOnAndConnect()##
-     #change back to 180
-      sleep(30)
+
+      response = messagebox.askokcancel(
+             "send files","Warning Sending files will halt the program until all the files are sent, this could take hours") 
+      if not response: return 
+
+      self.turnFileServerOnAndConnect()
+      sleep(120)
 
       subprocess.run('./scripts/connect_to_vpn.sh', shell=True) 
 
       if self.fileServerIsOn(): 
-        #self.sendFilesBtn.after(1000, lambda: self.sendFilesBtn.configure(text='file server is on uploading files now'))
-
-       # response = messagebox.askokcancel(
-       # "send files","Warning Sending files will halt the program until all the files are sent, this could take hours") 
-       # if not response: return 
-       # self.sendFilesBtn.after(1000, lambda: self.sendFilesBtn.configure(text='server in on!'))
-
-        self.sendFilesLabel['text'] = 'Server is starting...\nplease wait 3 minutes to start file transfer' 
         process = subprocess.run('./scripts/send_recordings_to_server.sh', shell=True, capture_output=True) 
         
-        
-        #TO DO display the uploading video
     def turnFileServerOnAndConnect(self): 
         subprocess.Popen('./scripts/turn_server_on_and_connect.sh', shell=True)
 
